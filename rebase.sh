@@ -4,7 +4,11 @@
 count=1
 for param in "$@"; do
 
+
     echo "\$@ Parameter #$count = $param"
+
+
+
 
 
 
@@ -12,10 +16,5 @@ for param in "$@"; do
 done
 
 echo "====="
-
-
-
-
-
 
 
