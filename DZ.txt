@@ -1,6 +1,66 @@
-vagrant@vagrant:~$ cat > test_bash
-new line
-vagrant@vagrant:~$ cat test_bash>test_bash_out
-vagrant@vagrant:~$ cat test_bash_out
-new line
-vagrant@vagrant:~$
+1. 
+chdir("/tmp")
+
+2. 
+Файл базы типов - /usr/share/misc/magic.mgc
+
+3.
+lsof | grep deleted - ищем удаленные файлы,но еще открытые для записи,  находим наш.
+cat /dev/null > /proc/3446/fd/5
+где 3446 - PID, 5 -дискриптор нашего файла
+
+4.
+Зобми не занимают ресурсы в ОС
+
+5.
+vagrant@vagrant:~$ sudo /usr/sbin/opensnoop-bpfcc
+PID    COMM               FD ERR PATH
+376    systemd-udevd      14   0 /sys/fs/cgroup/unified/system.slice/systemd-udevd.service/cgroup.procs
+376    systemd-udevd      14   0 /sys/fs/cgroup/unified/system.slice/systemd-udevd.service/cgroup.threads
+1025   vminfo              6   0 /var/run/utmp
+568    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
+568    dbus-daemon        18   0 /usr/share/dbus-1/system-services
+568    dbus-daemon        -1   2 /lib/dbus-1/system-services
+568    dbus-daemon        18   0 /var/lib/snapd/dbus-1/system-services/
+
+6.
+uname -a -print all information
+цитата из man -  Part of the utsname information is also accessible  via  /proc/sys/ker‐
+       nel/{ostype, hostname, osrelease, version, domainname}.
+
+7.
+Чем отличается последовательность команд через ; и через && в bash? 
+; - разделить команд, чтобы bash не спутал с агрументом. Если первая команда не выполниться, то вторая всё равно запуститься
+$$ - управляющий оператор. Если в командной строке стоит command1 && command2, то command2 выполняется в том случае, 
+если статус выхода из команды command1 равен нулю (выполнилась).
+
+Есть ли смысл использовать в bash &&, если применить set -e?
+Думаю, что не имеет. При set -e, программа завершится при ошибке (выход из программы равен нулю)
+
+8. 
+Из каких опций состоит режим bash set -euxo pipefail и почему его хорошо было бы использовать в сценариях?
+
+-e прерывает выполнение исполнения при ошибке любой команды кроме последней в последовательности 
+-x вывод трейса простых команд 
+-u неустановленные/не заданные параметры и переменные считаются как ошибки, с выводом в stderr текста ошибки и выполнит завершение неинтерактивного вызова
+-o pipefail возвращает код возврата набора/последовательности команд, ненулевой при последней команды или 0 для успешного выполнения команд.
+
+Можно вести дополнительный лог
+
+9.
+Используя -o stat для ps, определите, какой наиболее часто встречающийся статус у процессов в системе. 
+В man ps ознакомьтесь (/PROCESS STATE CODES) что значат дополнительные к основной заглавной буквы статуса процессов. 
+Его можно не учитывать при расчете (считать S, Ss или Ssl равнозначными).
+
+S -наиболее часто встречающийся процесс.
+Дополнительные, к основной заглавной, буквы статуса процессов - это коды процесса STATE
+D    Uninterruptible sleep (usually IO)
+       R    Running or runnable (on run queue)
+       S    Interruptible sleep (waiting for an event to complete)
+       T    Stopped, either by a job control signal or because it is being
+            traced.
+       W    paging (not valid since the 2.6.xx kernel)
+       X    dead (should never be seen)
+       Z    Defunct ("zombie") process, terminated but not reaped by its
+            parent.
+
