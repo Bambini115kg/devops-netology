@@ -194,6 +194,19 @@ vagrant@vagrant:/$ sudo gzip -t /tmp/new/test.gz.
 vagrant@vagrant:/$ echo $?
 0
 
+20.
+
+vagrant@vagrant:/$ exit
+logout
+Connection to 127.0.0.1 closed.
+
+c:\test>vagrant destroy
+    default: Are you sure you want to destroy the 'default' VM? [y/N] y
+==> default: Forcing shutdown of VM...
+==> default: Destroying VM and associated drives...
+
+c:\test>
+
 Домашнее задание по лекции "Работа в терминале (лекция 2)"
 
 1. CD -внутренняя команда. Это логично, если надо менять указатели на дериктори, то лучше делать это используя внутреннюю команду.
