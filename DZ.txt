@@ -1,0 +1,6 @@
+vagrant@vagrant:~$ cat > test_bash
+new line
+vagrant@vagrant:~$ cat test_bash>test_bash_out
+vagrant@vagrant:~$ cat test_bash_out
+new line
+vagrant@vagrant:~$
