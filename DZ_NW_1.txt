@@ -1,0 +1,104 @@
+1.
+HTTP/1.1 301 Moved Permanently - стандартный код ответа HTTP, получаемый в ответ от сервера в ситуации, 
+когда запрошенный ресурс был на постоянной основе перемещён в новое месторасположение, и указывающий на то, 
+что текущие ссылки, использующие данный URL, должны быть обновлены
+
+2. 
+2.1. Status Code: 301 Moved Permanently
+2.2. Waiting (TTFB) -132.49 ms
+
+3. 46.242.15.51 
+
+4.
+vagrant@vagrant:~$ whois -h whois.ripe.net 46.242.15.51
+
+........
+role:           NCNET NCC Operations
+............
+origin:         AS42610
+............
+
+5.
+5.1. Пакет проходит через 10,192,77,108,209 и 216 сети
+5.2. AS42610 и AS15169
+
+vagrant@vagrant:~$ traceroute -IAn 8.8.8.8
+
+traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
+ 1  10.0.2.2 [*]  0.950 ms  0.766 ms  0.640 ms
+ 2  192.168.0.1 [*]  4.961 ms  7.195 ms  7.079 ms
+ 3  * * *
+ 4  192.168.126.204 [*]  6.613 ms  6.484 ms  6.365 ms
+ 5  77.37.250.221 [AS42610]  6.014 ms  5.897 ms  5.789 ms
+ 6  77.37.250.249 [AS42610]  5.794 ms  7.879 ms  7.610 ms
+ 7  72.14.209.81 [AS15169]  7.365 ms  8.798 ms  8.517 ms
+ 8  108.170.250.129 [AS15169]  11.639 ms  11.349 ms  10.907 ms
+ 9  108.170.250.130 [AS15169]  10.642 ms  10.258 ms  9.255 ms
+10  209.85.255.136 [AS15169]  22.471 ms  22.223 ms  21.979 ms
+11  209.85.254.20 [AS15169]  23.690 ms  23.520 ms  24.381 ms
+12  216.239.63.27 [AS15169]  22.458 ms  22.182 ms  23.275 ms
+13  * * *
+14  * * *
+15  * * *
+16  * * *
+17  * * *
+18  * * *
+19  * * *
+20  * * *
+21  * * *
+22  8.8.8.8 [AS15169]  23.171 ms  23.036 ms  22.786 ms
+
+6.
+Не понял слегка вопроса про максимальную задержку
+6.1.Максимальное время задержки вот тут - 5. AS42610  77.37.250.221
+6.2. Максимальное среднее время задержки тут -  4. AS???    192.168.126.204  
+
+vagrant@vagrant:~$ mtr -zn 8.8.8.8
+
+                                                 My traceroute  [v0.93]
+vagrant (10.0.2.15)                                                                            2021-11-28T14:00:41+0000
+Keys:  Help   Display mode   Restart statistics   Order of fields   quit
+                                                                               Packets               Pings
+ Host                                                                        Loss%   Snt   Last   Avg  Best  Wrst StDev
+ 1. AS???    10.0.2.2                                                         0.0%    39    1.7   1.6   0.6   4.4   0.8
+ 2. AS???    192.168.0.1                                                      0.0%    39    4.7   3.3   1.7   6.0   0.9
+ 3. (waiting for reply)
+ 4. AS???    192.168.126.204                                                  5.1%    39    5.2  52.2   3.8 699.0 152.9
+ 5. AS42610  77.37.250.221                                                    0.0%    39    5.4  34.4   4.0 1002. 159.6
+ 6. AS42610  77.37.250.249                                                    0.0%    39    7.5   6.7   5.0  23.6   3.0
+ 7. AS15169  72.14.209.81                                                     0.0%    39    7.0  11.9   5.4  58.3  10.6
+ 8. AS15169  108.170.250.129                                                  0.0%    39    7.3   8.0   5.8  31.9   4.1
+ 9. AS15169  108.170.250.130                                                  0.0%    39    7.2   6.8   5.6   9.0   0.8
+10. AS15169  209.85.255.136                                                   0.0%    39   22.8  23.1  21.3  30.2   2.0
+11. AS15169  209.85.254.20                                                    0.0%    39   24.4  24.8  23.4  34.7   1.8
+12. AS15169  216.239.63.27                                                    0.0%    39   22.6  23.1  21.4  26.7   1.1
+13. (waiting for reply)
+14. (waiting for reply)
+15. (waiting for reply)
+16. (waiting for reply)
+17. (waiting for reply)
+18. (waiting for reply)
+19. (waiting for reply)
+20. (waiting for reply)
+21. (waiting for reply)
+22. AS15169  8.8.8.8                                                         10.5%    38   23.2  22.9  20.6  27.5   1.5
+
+
+7.
+7.1
+vagrant@vagrant:~$ dig dns.google +noall +answer +nocmd ns
+dns.google.             21600   IN      NS      ns3.zdns.google.
+dns.google.             21600   IN      NS      ns2.zdns.google.
+dns.google.             21600   IN      NS      ns1.zdns.google.
+dns.google.             21600   IN      NS      ns4.zdns.google.
+
+7.2.
+vagrant@vagrant:~$ dig dns.google +noall +answer
+dns.google.             410     IN      A       8.8.4.4
+dns.google.             410     IN      A       8.8.8.8
+
+8.
+vagrant@vagrant:~$ dig -x 8.8.8.8 +short
+dns.google.
+vagrant@vagrant:~$ dig -x 8.8.4.4 +short
+dns.google.
