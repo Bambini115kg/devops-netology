@@ -1,0 +1,150 @@
+1. 
+vagrant@vagrant:~$ wget https://github.com/prometheus/node_exporter/releases/download/v1.3.0/node_exporter-1.3.0.linux-amd64.tar.gz
+
+vagrant@vagrant:~$ tar xvzf node_exporter-1.3.0.linux-amd64.tar.gz
+
+vagrant@vagrant:~$ sudo useradd -rs /bin/false node_exporter
+useradd: user 'node_exporter' already exists
+
+vagrant@vagrant:~$ sudo cp node_exporter-1.3.0.linux-amd64/node_exporter /usr/local/bin
+
+vagrant@vagrant:~$ sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
+
+vagrant@vagrant:/$ cd /etc/systemd/system
+
+vagrant@vagrant:/etc/systemd/system$ sudo vim node_exporter.service  
+
+[Unit]
+Description=Prometheus Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+                        
+
+vagrant@vagrant:/etc/systemd/system$ sudo systemctl daemon-reload
+
+vagrant@vagrant:/etc/systemd/system$ sudo systemctl start node_exporter
+
+vagrant@vagrant:/etc/systemd/system$ sudo systemctl status node_exporter.service
+● node_exporter.service - Prometheus Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sun 2021-11-28 07:48:48 UTC; 12s ago
+   Main PID: 1186 (node_exporter)
+      Tasks: 4 (limit: 1071)
+     Memory: 2.3M
+     CGroup: /system.slice/node_exporter.service
+             └─1186 /usr/local/bin/node_exporter
+
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:115 level=info collector=thermal_zone
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:115 level=info collector=time
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:115 level=info collector=timex
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:115 level=info collector=udp_queues
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:115 level=info collector=uname
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:115 level=info collector=vmstat
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:115 level=info collector=xfs
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:115 level=info collector=zfs
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=node_exporter.go:199 level=info msg="Listening on" address=:9100
+Nov 28 07:48:48 vagrant node_exporter[1186]: ts=2021-11-28T07:48:48.067Z caller=tls_config.go:195 level=info msg="TLS is disabled." http2=false
+vagrant@vagrant:/etc/systemd/system$ sudo systemctl enable node_exporter
+vagrant@vagrant:/etc/systemd/system$ curl http://localhost:9100/metrics
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 0
+go_gc_duration_seconds{quantile="0.25"} 0
+go_gc_duration_seconds{quantile="0.5"} 0
+go_gc_duration_seconds{quantile="0.75"} 0
+go_gc_duration_seconds{quantile="1"} 0
+go_gc_duration_seconds_sum 0
+go_gc_duration_seconds_count 0
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 8
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+
+vagrant@vagrant:~$ systemctl stop node_exporter
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ===
+Authentication is required to stop 'node_exporter.service'.
+Authenticating as: vagrant,,, (vagrant)
+Password:
+==== AUTHENTICATION COMPLETE ===
+
+vagrant@vagrant:~$ systemctl start node_exporter
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ===
+Authentication is required to start 'node_exporter.service'.
+Authenticating as: vagrant,,, (vagrant)
+Password:
+==== AUTHENTICATION COMPLETE ===
+
+vagrant@vagrant:~$ curl http://localhost:9100/metrics
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 0
+go_gc_duration_seconds{quantile="0.25"} 0
+go_gc_duration_seconds{quantile="0.5"} 0
+go_gc_duration_seconds{quantile="0.75"} 0
+go_gc_duration_seconds{quantile="1"} 0
+
+2.
+
+CPU:
+    node_cpu_seconds_total{cpu="0",mode="idle"} 2238.49
+    node_cpu_seconds_total{cpu="0",mode="system"} 16.72
+        
+Memory:
+    node_memory_MemAvailable_bytes 
+    node_memory_MemFree_bytes
+    
+Disk:
+    node_disk_io_time_seconds_total{device="sda"} 
+    node_disk_read_bytes_total{device="sda"} 
+    
+    
+Network:
+    node_network_receive_errs_total{device="eth0"} 
+    node_network_receive_bytes_total{device="eth0"} 
+
+3.
+К домашке прикрепил скриншот выполнения отдельным файлом
+
+4.
+Да, осознаёт. Есть строчки указывающие на это, например:
+2.280464] systemd[1]: Detected virtualization oracle.
+
+5. 
+vagrant@vagrant:~$ /sbin/sysctl -n fs.nr_open
+1048576
+Максимальное число открытых дискрипторов в системе
+
+ulimit -n мягкий лимит, может не дать достичь  1048576
+
+6.
+root@vagrant:~# unshare -f --pid --mount-proc sleep1h
+root@vagrant:~# ps
+    PID TTY          TIME CMD
+  69993 pts/0    00:00:00 sudo
+  69994 pts/0    00:00:00 bash
+  70179 pts/0    00:00:00 sleep
+  70180 pts/0    00:00:00 ps
+root@vagrant:~# nsenter -t 70179 --mount --pid -i bash
+root@vagrant:/# ps
+    PID TTY          TIME CMD
+      1 pts/0    00:00:00 sleep
+      2 pts/0    00:00:00 bash
+      9 pts/0    00:00:00 ps
+7.
+У меня не стабилизировалась система. Вернее всё замерло и ctl+c возвращает в командную строку.
+Функция : вызывает саму себя дважды в фоновом режиме и после ; запускается. 
+Таким образом , каждая функция : порождает еще две таких.
+Можно ограничить число процессов с помощью ulimit -u
+
+
+   
