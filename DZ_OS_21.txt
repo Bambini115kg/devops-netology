@@ -1,0 +1,10 @@
+Уточнение по первому вопросу
+
+Если я правильно понял вопрос, то я могу добавлять опции в мой /etc/systemd/system/node_exporter.service 
+
+- через systemctl edit --full node_exporter.service 
+  
+- через drop-in файлы .conf, которые надо помещать в созданный каталог /etc/systemd/system/node_exporter.d/
+
+
+   
