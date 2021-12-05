@@ -1,0 +1,114 @@
+1. 
+vagrant@vagrant:~$ telnet route-views.routeviews.org
+Trying 128.223.51.103...
+Connected to route-views.routeviews.org.
+Escape character is '^]'.
+
+route-views>show ip route 46.242.15.51
+Routing entry for 46.242.12.0/22
+  Known via "bgp 6447", distance 20, metric 0
+  Tag 852, type external
+  Last update from 154.11.12.212 4d04h ago
+  Routing Descriptor Blocks:
+  * 154.11.12.212, from 154.11.12.212, 4d04h ago
+      Route metric is 0, traffic share count is 1
+      AS Hops 3
+      Route tag 852
+      MPLS label: none
+
+route-views>show bgp 46.242.15.51
+BGP routing table entry for 46.242.12.0/22, version 1388581979
+Paths: (24 available, best #16, table default)
+  Not advertised to any peer
+  Refresh Epoch 1
+  4901 6079 1299 42610
+    162.250.137.254 from 162.250.137.254 (162.250.137.254)
+      Origin incomplete, localpref 100, valid, external
+      Community: 65000:10100 65000:10300 65000:10400
+      path 7FE0BDA14780 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 3
+  3303 1273 12389 42610
+    217.192.89.50 from 217.192.89.50 (138.187.128.158)
+      Origin IGP, localpref 100, valid, external
+      Community: 1273:12276 1273:32090 3303:1004 3303:1006 3303:3056
+      path 7FE15270A518 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  7660 2516 12389 42610
+    203.181.248.168 from 203.181.248.168 (203.181.248.168)
+      Origin IGP, localpref 100, valid, external
+      Community: 2516:1050 7660:9003
+      path 7FE03B1BD7C8 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  3267 1299 42610
+    194.85.40.15 from 194.85.40.15 (185.141.126.1)
+      Origin incomplete, metric 0, localpref 100, valid, external
+      path 7FE1260562B0 RPKI State not found
+
+2.
+
+vagrant@vagrant:~$ sudo modprobe -v dummy numdummies=2
+insmod /lib/modules/5.4.0-80-generic/kernel/drivers/net/dummy.ko numdummies=0 numdummies=2
+
+vagrant@vagrant:~$ lsmod | grep dummy
+dummy                  16384  0
+
+vagrant@vagrant:~$ ifconfig -a | grep dummy
+dummy0: flags=130<BROADCAST,NOARP>  mtu 1500
+dummy1: flags=130<BROADCAST,NOARP>  mtu 1500
+
+vagrant@vagrant:~$ sudo ip addr add 192.168.1.150/24 dev dummy0
+vagrant@vagrant:~$ sudo ip addr add 192.168.0.150/29 dev dummy0
+
+vagrant@vagrant:~$ routel
+         target            gateway          source    proto    scope    dev tbl
+        default           10.0.2.2       10.0.2.15     dhcp            eth0
+      10.0.2.0/ 24                       10.0.2.15   kernel     link   eth0
+       10.0.2.2                          10.0.2.15     dhcp     link   eth0
+       10.0.2.0          broadcast       10.0.2.15   kernel     link   eth0 local
+      10.0.2.15              local       10.0.2.15   kernel     host   eth0 local
+     10.0.2.255          broadcast       10.0.2.15   kernel     link   eth0 local
+      127.0.0.0          broadcast       127.0.0.1   kernel     link     lo local
+     127.0.0.0/ 8            local       127.0.0.1   kernel     host     lo local
+      127.0.0.1              local       127.0.0.1   kernel     host     lo local
+127.255.255.255          broadcast       127.0.0.1   kernel     link     lo local
+  192.168.0.150              local   192.168.0.150   kernel     host dummy0 local
+  192.168.1.150              local   192.168.1.150   kernel     host dummy0 local
+            ::1                                      kernel              lo
+        fe80::/ 64                                   kernel            eth0
+/usr/bin/routel: 48: shift: can't shift that many            ::1              local                   kernel
+  lo local
+fe80::a00:27ff:fe73:60cf              local                   kernel            eth0 local
+
+3.
+
+vagrant@vagrant:~$ sudo ss -lntp
+State  Recv-Q Send-Q  Local Address:Port    Peer Address:Port Process
+LISTEN 0      4096          0.0.0.0:19999        0.0.0.0:*     users:(("netdata",pid=832,fd=4))
+LISTEN 0      4096          0.0.0.0:111          0.0.0.0:*     users:(("rpcbind",pid=573,fd=4),("systemd",pid=1,fd=35))
+LISTEN 0      4096    127.0.0.53%lo:53           0.0.0.0:*     users:(("systemd-resolve",pid=575,fd=13))
+LISTEN 0      128           0.0.0.0:22           0.0.0.0:*     users:(("sshd",pid=849,fd=3))
+LISTEN 0      4096        127.0.0.1:8125         0.0.0.0:*     users:(("netdata",pid=832,fd=50))
+LISTEN 0      4096                *:9100               *:*     users:(("node_exporter",pid=833,fd=3))
+LISTEN 0      4096             [::]:111             [::]:*     users:(("rpcbind",pid=573,fd=6),("systemd",pid=1,fd=37))
+LISTEN 0      128              [::]:22              [::]:*     users:(("sshd",pid=849,fd=4))
+LISTEN 0      4096            [::1]:8125            [::]:*     users:(("netdata",pid=832,fd=49))
+
+4.
+
+vagrant@vagrant:~$ sudo ss -lnup
+State  Recv-Q Send-Q   Local Address:Port   Peer Address:Port Process
+UNCONN 0      0            127.0.0.1:8125        0.0.0.0:*     users:(("netdata",pid=832,fd=48))
+UNCONN 0      0        127.0.0.53%lo:53          0.0.0.0:*     users:(("systemd-resolve",pid=575,fd=12))
+UNCONN 0      0       10.0.2.15%eth0:68          0.0.0.0:*     users:(("systemd-network",pid=400,fd=19))
+UNCONN 0      0              0.0.0.0:111         0.0.0.0:*     users:(("rpcbind",pid=573,fd=5),("systemd",pid=1,fd=36))
+UNCONN 0      0                [::1]:8125           [::]:*     users:(("netdata",pid=832,fd=47))
+UNCONN 0      0                 [::]:111            [::]:*     users:(("rpcbind",pid=573,fd=7),("systemd",pid=1,fd=38))
+
+5.
+
+
+
+
