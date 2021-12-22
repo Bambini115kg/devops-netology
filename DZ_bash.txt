@@ -1,7 +1,7 @@
 1.
 e=3  - $(($a+$b)) такая форма записи предполагает получение числового результата выражения в скобках
 d= 1+2  - такой результат из-за того, что переменные а и в строки
-c=a+b - в переменную с, записали строку а+в
+c=a+b - в переменную с, записали строку а+b
 
 2.
 #!/usr/bin/env bash
@@ -19,73 +19,36 @@ done
 
 #!/usr/bin/env bash
 
-s1=https://192.168.0.1:80
-s2=https://173.194.222.113:80
-s3=https://87.250.250.242:80
+ip=(192.168.0.1:80 173.194.222.113:80 87.250.250.242:80)
 
-for ((i=1;i<=5;i++))
+for i in ${ip[@]}
 do
-        curl  $s1
-        if (($? == 0))
-        then
-                echo "Connect" $i "to" $s1 "is succs" >> log.log
-        else
-                echo "Connect" $i "to" $s1 "is faild" >> log.log
-fi
-        curl -V $s2
-        if (($? == 0))
-        then
-                echo "Connect" $i "to" $s2 "is succs" >> log.log
-        else
-                echo "Connect" $i "to" $s2 "is faild" >> log.log
-fi
-           
-        curl -V $s3
-        if (($? == 0))
-        then
-                echo "Connect" $i "to" $s3 "is succs" >> log.log
-        else
-                echo "Connect" $i "to" $s3 "is faild" >> log.log
-fi
+        for ((j=1; j<=5;j++))
+        do
+                curl  $ip[i]
+                if (($? == 0))
+                then
+                echo "Connect" $j "to" $i "is succs" >> log.log
+                 else
+                echo "Connect" $j "to" $i "is faild" >> log.log
+                fi
+        done
 done
 
 4. 
 #!/usr/bin/env bash
-s1=192.168.0.1:80
-s2=173.194.222.113:80
-s3=87.250.250.242:80
-s4=0
-while ((1==1))
-do
-        curl  $s1
-        if (($? == 0))
-        then
-                echo "Connect" $i "to" $s1 "is succs" >> log.log
-        else
-                echo "Connect" $i "to" $s1 "is faild" >> error.log
-                exit
-fi
-        curl -V $s2
-        if (($? == 0))
-        then
-                echo "Connect" $i "to" $s2 "is succs" >> log.log
-        else
-                echo "Connect" $i "to" $s2 "is faild" >> error.log
-                exit
-fi
-        curl -V $s3
-        if (($? == 0))
-        then
-                echo "Connect" $i "to" $s3 "is succs" >> log.log
-        else
-                echo "Connect" $i "to" $s3 "is faild" >> error.log
-                exit
-fi
-        let "s4+=1"
-        if (($s4 > 50))
-        then
-        echo "Clear log.log"
-        sudo cat /dev/null>log.log
-fi"
 
+ip=(192.168.0.1:80 173.194.222.113:80 87.250.250.242:80)
+
+while  ((1==1))
+do
+        for i in ${ip[@]}
+        do
+                curl  $i
+                if (($? != 0))
+                then
+                        echo "Connect to" $i "is faild" >> error.log
+                exit
+                fi
+        done
 done
