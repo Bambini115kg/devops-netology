@@ -27,18 +27,18 @@ c = a + b
 Мы устроились на работу в компанию, где раньше уже был DevOps Engineer. Он написал скрипт, позволяющий узнать, какие файлы модифицированы в репозитории, относительно локальных изменений. Этим скриптом недовольно начальство, потому что в его выводе есть не все изменённые файлы, а также непонятен полный путь к директории, где они находятся. Как можно доработать скрипт ниже, чтобы он исполнял требования вашего руководителя?
 
 ```python
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 
 import os
 
-bash_command = ["cd ~/netology/sysadm-homeworks", "git status"]
+bash_command = ["git status"]
 result_os = os.popen(' && '.join(bash_command)).read()
-is_change = False
+
 for result in result_os.split('\n'):
     if result.find('modified') != -1:
         prepare_result = result.replace('\tmodified:   ', '')
-        print(prepare_result)
-        break
+        p = os.path.abspath(prepare_result)
+        print(p)
 ```
 
 ### Ваш скрипт:
@@ -59,7 +59,9 @@ for result in result_os.split('\n'):
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+C:\Users\Admin\Documents\GitHub\devops-netology\kot\kot1
+C:\Users\Admin\Documents\GitHub\devops-netology\kot\kot2
+C:\Users\Admin\Documents\GitHub\devops-netology\kot\py2.py
 ```
 
 ## Обязательная задача 3
@@ -67,50 +69,29 @@ for result in result_os.split('\n'):
 
 ### Ваш скрипт:
 ```python
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 
 import os
 import sys
 
-cmd = os.getcwd()
+cmd = sys.argv[1]
 
-if len(sys.argv)>=2:
-    cmd = sys.argv[1]
-bash_command = ["cd "+cmd, "git status 2>&1"]
-
-print('\033[31m')
+bash_command = [r"cd " +cmd, "git status"]
 result_os = os.popen(' && '.join(bash_command)).read()
-#is_change = False
+
 for result in result_os.split('\n'):
-    if result.find('fatal') != -1:
-        print('\033[31m Каталог \033[1m '+cmd+'\033[0m\033[31m не является GIT репозиторием\033[0m')    
-    if result.find('изменено') != -1:
-        prepare_result = result.replace('\tизменено: ', '')
-# добавил замену всех оставшихся пробелов в строке для удобства вывода
-        prepare_result = prepare_result.replace(' ', '') 
-        print(cmd+prepare_result)
-#        break
-print('\033[0m')
+    if result.find('modified') != -1:
+        prepare_result = result.replace('\tmodified:   ', '')
+        p = os.path.abspath(prepare_result)
+        print(p)
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-22:20:40 alex@upc(0):~/python$ ./dz2.py ~/devops-netology/
-
-/home/alex/devops-netology/README.md
-/home/alex/devops-netology/dz5/dz.txt
-/home/alex/devops-netology/file4taguse
-/home/alex/devops-netology/renamed_file.txt
-
-22:22:24 alex@upc(0):~/python$ ./dz2.py ~/devops-net/
-
-/bin/sh: 1: cd: can't cd to /home/alex/devops-net/
-
-22:22:26 alex@upc(0):~/python$ ./dz2.py
-
- Каталог  /home/alex/python не является GIT репозиторием
-
-22:22:30 alex@upc(0):~/python$ 
+PS C:\Users\Admin\Documents\GitHub\devops-netology\kot> python3 py2.py C:\Users\Admin\Documents\GitHub\devops-netology\kot      
+C:\Users\Admin\Documents\GitHub\devops-netology\kot\kot1
+C:\Users\Admin\Documents\GitHub\devops-netology\kot\kot2
+C:\Users\Admin\Documents\GitHub\devops-netology\kot\py2.py
 ```
 
 ## Обязательная задача 4
@@ -118,6 +99,8 @@ print('\033[0m')
 
 ### Ваш скрипт:
 ```python
+#!/usr/bin/env python3
+
 import socket as s
 import time as t
 import datetime as dt
@@ -148,22 +131,13 @@ while 1==1 : #отладочное число проверок
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-22:39:03 alex@upc(0):~/python$ ./dz3.py
 *** start script ***
 {'drive.google.com': '0.0.0.0', 'mail.google.com': '0.0.0.0', 'google.com': '0.0.0.0'}
 ********************
-2020-11-26 22:39:20 [ERROR] drive.google.com IP mistmatch: 0.0.0.0 173.194.73.194
-2020-11-26 22:39:20 [ERROR] mail.google.com IP mistmatch: 0.0.0.0 64.233.165.83
-2020-11-26 22:39:20 [ERROR] google.com IP mistmatch: 0.0.0.0 173.194.221.139
-2020-11-26 22:40:46 [ERROR] mail.google.com IP mistmatch: 64.233.165.83 64.233.165.19
-2020-11-26 22:40:48 [ERROR] mail.google.com IP mistmatch: 64.233.165.19 64.233.165.83
-2020-11-26 22:40:52 [ERROR] google.com IP mistmatch: 173.194.221.139 173.194.222.101
-2020-11-26 22:40:54 [ERROR] google.com IP mistmatch: 173.194.222.101 173.194.222.100
-2020-11-26 22:41:18 [ERROR] google.com IP mistmatch: 173.194.222.100 64.233.164.139
-2020-11-26 22:41:20 [ERROR] google.com IP mistmatch: 64.233.164.139 64.233.164.138
-2020-11-26 22:41:36 [ERROR] drive.google.com IP mistmatch: 173.194.73.194 108.177.14.194
-2020-11-26 22:42:04 [ERROR] drive.google.com IP mistmatch: 108.177.14.194 173.194.73.194
-22:42:40 alex@upc(0):~/python$ 
+2021-12-24 16:14:53 [ERROR] drive.google.com IP mistmatch: 0.0.0.0 64.233.165.194
+2021-12-24 16:14:53 [ERROR] mail.google.com IP mistmatch: 0.0.0.0 108.177.14.19
+2021-12-24 16:14:53 [ERROR] google.com IP mistmatch: 0.0.0.0 173.194.73.102
+PS C:\Users\Admin\Documents\GitHub\devops-netology\kot> 
 ```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
