@@ -27,7 +27,23 @@ c = a + b
 Мы устроились на работу в компанию, где раньше уже был DevOps Engineer. Он написал скрипт, позволяющий узнать, какие файлы модифицированы в репозитории, относительно локальных изменений. Этим скриптом недовольно начальство, потому что в его выводе есть не все изменённые файлы, а также непонятен полный путь к директории, где они находятся. Как можно доработать скрипт ниже, чтобы он исполнял требования вашего руководителя?
 
 ```python
- #!/usr/bin/env python3
+#!/usr/bin/env python3
+
+import os
+
+bash_command = ["cd ~/netology/sysadm-homeworks", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+is_change = False
+for result in result_os.split('\n'):
+    if result.find('modified') != -1:
+        prepare_result = result.replace('\tmodified:   ', '')
+        print(prepare_result)
+        break
+```
+
+### Ваш скрипт:
+```python
+#!/usr/bin/env python3
 
 import os
 
@@ -39,22 +55,6 @@ for result in result_os.split('\n'):
         prepare_result = result.replace('\tmodified:   ', '')
         p = os.path.abspath(prepare_result)
         print(p)
-```
-
-### Ваш скрипт:
-```python
-#!/usr/bin/env python3
-
-import os
-
-bash_command = ["cd ~/devops3-netology", "git status"]
-result_os = os.popen(' && '.join(bash_command)).read()
-#is_change = False
-for result in result_os.split('\n'):
-    if result.find('изменено') != -1:
-        prepare_result = result.replace('\tизменено:   ', '')
-        print(prepare_result)
-#        break
 ```
 
 ### Вывод скрипта при запуске при тестировании:
