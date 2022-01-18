@@ -164,7 +164,7 @@ sudo service nginx reload
 ```
 5. Crontab работает (выберите число и время так, чтобы показать что crontab запускается и делает что надо)
 ```buildoutcfg
-10 * * * * /home/vagrant/script_crt - такое в crontab записал
+20 * * * * /home/vagrant/script_crt - такое в crontab записал
 
 vagrant@vagrant:~$ grep CRON /var/log/syslog
 
