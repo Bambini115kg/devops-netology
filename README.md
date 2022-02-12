@@ -1,53 +1,55 @@
-## Домашнее задание к занятию "5.3. Введение. Экосистема. Архитектура. Жизненный цикл Docker контейнера"
-
+## Домашнее задание к занятию "5.5. Оркестрация кластером Docker контейнеров на примере Docker Swarm"
 ### Задача 1
-Сценарий выполения задачи:
+Дайте письменные ответы на следующие вопросы:
 
-создайте свой репозиторий на https://hub.docker.com;
-выберете любой образ, который содержит веб-сервер Nginx;
-создайте свой fork образа;
-реализуйте функциональность: запуск веб-сервера в фоне с индекс-страницей, содержащей HTML-код ниже:
-
-Опубликуйте созданный форк в своем репозитории и предоставьте ответ в виде ссылки на https://hub.docker.com/username_repo.
 ```
-https://hub.docker.com/repository/docker/bambini115kg/netology-devops
+- В чём отличие режимов работы сервисов в Docker Swarm кластере: replication и global?
+    В случае "replication", можно запустить несколько реплик одной задачи ,а в случае "global", 
+    запускается одна задача (антивирус например).
+- Какой алгоритм выбора лидера используется в Docker Swarm кластере?
+    RAFT. Сначала все узлы folower и все стремятся стать кандидатами с помощью таймера (рандомное время от 150 до 300мс).
+    У кого таймер отработал первый, тот отправляет запросы остальным узлам, чтобы получить голоса.
+    После получения болшинства голосов, становится менеджером. В случае, если таймеры отсичтывают одинаково у двух и более
+    фоловеров, то процесс перезапускается. Это, если в кратце)
+- Что такое Overlay Network? 
+    Сеть налодженная поверх другой сети (типа VPN)
 ```
 ### Задача 2
-Посмотрите на сценарий ниже и ответьте на вопрос: "Подходит ли в этом сценарии использование Docker контейнеров или лучше подойдет виртуальная машина, физическая машина? Может быть возможны разные варианты?"
-Детально опишите и обоснуйте свой выбор.
+ПСоздать ваш первый Docker Swarm кластер в Яндекс.Облаке
+
+Для получения зачета, вам необходимо предоставить скриншот из терминала (консоли), с выводом команды:
+
+docker node ls
 
 ```
-Высоконагруженное монолитное java веб-приложение;
- - физический сервер, т.к. высоконагруженное монолитное (само за себя говорит).
-Nodejs веб-приложение;
- - это веб приложение, для таких приложений достаточно докера. 
-Мобильное приложение c версиями для Android и iOS;
- - Виртуальная машина или физический сервер, зависит от приложения.
- Шина данных на базе Apache Kafka;
- - Почитал об этой шине. Думаю, что контейнеры хорошо подойдут в силу того, что 
- кластеризация горизонтальная (задействуются новые машины), то надо иметь правильный образ + 
- возможность быстро развернуть.
- Elasticsearch кластер для реализации логирования продуктивного веб-приложения - три ноды elasticsearch, два logstash и две ноды kibana;
- - Пришлось опять прочитать (не до конца понял всей схемы), в документации к Elasticsearch речь идёт о 
- физическом сервере, под kibana можно контейнеры (поставил и забыл), под logstash наверное виртуалки можно, ибо
- особо они ничего не делают, но возмоно надо вносить изменения в конфигурацию, чсто через контейнер не очень удобно.
- Мониторинг-стек на базе prometheus и grafana;
- - сами системы не хранят как таковых данны, можно развернуть на Докере
- Mongodb, как основное хранилище данных для java-приложения;
- - можно использовать Виртуальную машину, т.к. хранилище и  не сказано что высоконагруженное
- Gitlab сервер для реализации CI/CD процессов и приватный (закрытый) Docker Registry.
- - Я тут затрудняюсь ответить, но по ощущениям нужен физический сервер, всё таки важная часть продакш  
+[root@node01 ~]# docker node ls
+ID                            HOSTNAME             STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+n78t99qd7fkgsttv15wh99h5i *   node01.netology.yc   Ready     Active         Leader           20.10.12
+wc4p9vd02ujdrlt1am8jrhrbb     node02.netology.yc   Ready     Active         Reachable        20.10.12
+uda4kib2z48rft7n7gyzhu8ih     node03.netology.yc   Ready     Active         Reachable        20.10.12
+7nv29ygsyoq46l8tz0g69dlfk     node04.netology.yc   Ready     Active                          20.10.12
+iso1ev4uycsp408wa4h63wrjs     node05.netology.yc   Down      Active                          20.10.12
+nwhjpd9e7zyqe2t2xd19mxvju     node06.netology.yc   Ready     Active                          20.10.12
+[root@node01 ~]# 
 ```
 ### Задача 3
+Создать ваш первый, готовый к боевой эксплуатации кластер мониторинга, состоящий из стека микросервисов.
 
+Для получения зачета, вам необходимо предоставить скриншот из терминала (консоли), с выводом команды:
+
+docker service ls
 ```
-vagrant@vagrant:~/data$ docker run -v /home/vagrant/data:/data --name centos -itd centos
-vagrant@vagrant:~/data$ docker run -v /home/vagrant/data:/data --name debian -itd debian
-vagrant@vagrant:~/data$ docker exec centos touch /data/test.txt
-vagrant@vagrant:~/data$ touch test1.txt
-vagrant@vagrant:~/data$ docker exec debian ls /data
-test.txt
-test1.txt
+[root@node01 ~]# docker service ls
+ID             NAME                                MODE         REPLICAS   IMAGE                                          PORTS
+w9ks265rmljk   swarm_monitoring_alertmanager       replicated   1/1        stefanprodan/swarmprom-alertmanager:v0.14.0
+r35b4q1aavie   swarm_monitoring_caddy              replicated   1/1        stefanprodan/caddy:latest                      *:3000->3000/tcp, *:9090->9090/tcp, *:9093-9094->9093-9094/tcp
+b7sav2zq115t   swarm_monitoring_cadvisor           global       6/5        google/cadvisor:latest
+ks4xc0uilutk   swarm_monitoring_dockerd-exporter   global       6/5        stefanprodan/caddy:latest
+ifahi7vm7as2   swarm_monitoring_grafana            replicated   1/1        stefanprodan/swarmprom-grafana:5.3.4
+v2qlo2ipm1b1   swarm_monitoring_node-exporter      global       6/5        stefanprodan/swarmprom-node-exporter:v0.16.0
+47hk03jtccrn   swarm_monitoring_prometheus         replicated   1/1        stefanprodan/swarmprom-prometheus:v2.5.0
+6g01xd5ptoob   swarm_monitoring_unsee              replicated   1/1        cloudflare/unsee:v0.8.0
+[root@node01 ~]#
 
 ```
 
